@@ -18,7 +18,7 @@
   <a href="#-sobre-o-projeto">Sobre</a> •
   <a href="#-funcionalidades">Funcionalidades</a> •
   <a href="#-instalação-rápida">Instalação</a> •
-  <a href="#-desenvolvimento">Desenvolvimento</a> •
+  <a href="#%EF%B8%8F-desenvolvimento">Desenvolvimento</a> •
   <a href="#-contribuição">Contribuição</a> •
   <a href="#-licença">Licença</a>
 </p>
