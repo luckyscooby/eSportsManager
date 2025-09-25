@@ -76,6 +76,7 @@ eSports Manager
 
 ### Pré-requisitos Mínimos
 - **Java Runtime Environment (JRE) 21+**
+- **Servidor MariaDB/MySQL local instalado e em execução**
 - Sistema operacional: Windows 10+, macOS 10.14+, ou Linux
 
 ### Download e Execução
@@ -83,11 +84,16 @@ eSports Manager
 1. **Baixe a versão mais recente:**
    - Acesse a seção [Releases](../../releases) deste repositório
    - Baixe o arquivo `eSportsManager-1.0.jar`
+  
+2. **Configure o Banco de Dados:**
+   - O usuário final precisa ter um servidor MariaDB/MySQL rodando localmente. As instruções de configuração do banco (criação das tabelas) estão na seção de **Desenvolvimento**.
 
-2. **Execute a aplicação:**
+3. **Execute a aplicação:**
    ```bash
    java -jar eSportsManager-1.0.jar
    ```
+
+⚠️ **Aviso:** A aplicação se conecta a um banco de dados local (localhost). Certifique-se de que o serviço do MariaDB está ativo e que o banco de dados e tabelas foram criados conforme as instruções.
 
 ### Instalação do Java (se necessário)
 
