@@ -20,25 +20,30 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller para a tela de Gerenciamento de Usuários.
+ * Responsável por listar, e acionar as janelas de adicionar, editar e excluir usuários.
+ */
 public class GerenciamentoUsuariosController {
 
-    @FXML
-    private TableView<Usuario> tabelaUsuarios;
-    @FXML
-    private TableColumn<Usuario, Integer> colunaId;
-    @FXML
-    private TableColumn<Usuario, String> colunaNome;
-    @FXML
-    private TableColumn<Usuario, String> colunaEmail;
-    @FXML
-    private TableColumn<Usuario, String> colunaCargo;
+    @FXML private TableView<Usuario> tabelaUsuarios;
+    @FXML private TableColumn<Usuario, Integer> colunaId;
+    @FXML private TableColumn<Usuario, String> colunaNome;
+    @FXML private TableColumn<Usuario, String> colunaEmail;
+    @FXML private TableColumn<Usuario, String> colunaCargo;
 
-    private UsuarioDAO usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
 
+    /**
+     * Construtor. Inicializa o DAO.
+     */
     public GerenciamentoUsuariosController() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    /**
+     * Método de inicialização. Configura as colunas da tabela e carrega os dados iniciais.
+     */
     @FXML
     public void initialize() {
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -48,21 +53,27 @@ public class GerenciamentoUsuariosController {
         carregarDadosTabela();
     }
 
+    /**
+     * Busca os usuários no banco de dados e atualiza a TableView.
+     */
     private void carregarDadosTabela() {
         try {
             List<Usuario> usuarios = usuarioDAO.listarTodos();
             ObservableList<Usuario> usuariosObservaveis = FXCollections.observableArrayList(usuarios);
             tabelaUsuarios.setItems(usuariosObservaveis);
         } catch (Exception e) {
-            mostrarAlerta("Erro", "Não foi possível carregar os usuários.");
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Não foi possível carregar os usuários.");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Manipula o evento de clique no botão "Adicionar Novo".
+     * Abre a janela de cadastro de usuário e atualiza a tabela após o fechamento.
+     */
     @FXML
     private void handleAdicionarButtonAction() {
         try {
-            // CAMINHO ATUALIZADO
             FXMLLoader fxmlLoader = new FXMLLoader(ESportsManager.class.getResource("/view/CadastroUsuarioView.fxml"));
             Stage stage = new Stage();
             stage.setTitle("Cadastrar Novo Usuário");
@@ -77,12 +88,15 @@ public class GerenciamentoUsuariosController {
         }
     }
 
+    /**
+     * Manipula o evento de clique no botão "Editar Selecionado".
+     * Abre a janela de edição com os dados do usuário selecionado na tabela.
+     */
     @FXML
     private void handleEditarButtonAction() {
         Usuario selecionado = tabelaUsuarios.getSelectionModel().getSelectedItem();
         if (selecionado != null) {
             try {
-                // CAMINHO ATUALIZADO
                 FXMLLoader fxmlLoader = new FXMLLoader(ESportsManager.class.getResource("/view/EdicaoUsuarioView.fxml"));
                 Stage stage = new Stage();
                 stage.setTitle("Editar Usuário");
@@ -99,10 +113,14 @@ public class GerenciamentoUsuariosController {
                 e.printStackTrace();
             }
         } else {
-            mostrarAlerta("Nenhum usuário selecionado", "Por favor, selecione um usuário na tabela para editar.");
+            mostrarAlerta(Alert.AlertType.WARNING, "Nenhum usuário selecionado", "Por favor, selecione um usuário na tabela para editar.");
         }
     }
 
+    /**
+     * Manipula o evento de clique no botão "Excluir Selecionado".
+     * Pede confirmação e remove o usuário selecionado do banco de dados.
+     */
     @FXML
     private void handleExcluirButtonAction() {
         Usuario selecionado = tabelaUsuarios.getSelectionModel().getSelectedItem();
@@ -118,12 +136,19 @@ public class GerenciamentoUsuariosController {
                 carregarDadosTabela();
             }
         } else {
-            mostrarAlerta("Nenhum usuário selecionado", "Por favor, selecione um usuário na tabela para excluir.");
+            mostrarAlerta(Alert.AlertType.WARNING, "Nenhum usuário selecionado", "Por favor, selecione um usuário na tabela para excluir.");
         }
     }
 
-    private void mostrarAlerta(String titulo, String mensagem) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    /**
+     * Exibe um diálogo de alerta genérico para o usuário.
+     *
+     * @param tipoAlerta O tipo de alerta (ex: INFORMATION, WARNING, ERROR).
+     * @param titulo O título da janela de alerta.
+     * @param mensagem A mensagem a ser exibida.
+     */
+    private void mostrarAlerta(Alert.AlertType tipoAlerta, String titulo, String mensagem) {
+        Alert alert = new Alert(tipoAlerta);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensagem);

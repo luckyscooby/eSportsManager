@@ -11,50 +11,62 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller para a tela de Gerenciamento de Equipes.
+ * Permite listar, criar, editar e excluir equipes em uma única interface.
+ */
 public class GerenciamentoEquipesController {
 
-    // Componentes da Tabela
     @FXML private TableView<Equipe> tabelaEquipes;
     @FXML private TableColumn<Equipe, Integer> colunaId;
     @FXML private TableColumn<Equipe, String> colunaNome;
     @FXML private TableColumn<Equipe, String> colunaJogo;
 
-    // Componentes do Formulário
     @FXML private TextField nomeField;
     @FXML private ComboBox<String> jogoComboBox;
     @FXML private TextArea descricaoArea;
 
-    private EquipeDAO equipeDAO;
+    private final EquipeDAO equipeDAO;
 
+    /**
+     * Construtor. Inicializa o DAO.
+     */
     public GerenciamentoEquipesController() {
         this.equipeDAO = new EquipeDAO();
     }
 
+    /**
+     * Método de inicialização. Configura a tabela, o ComboBox e o listener de seleção.
+     */
     @FXML
     public void initialize() {
-        // Configura as colunas da tabela
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("nomeEquipe"));
         colunaJogo.setCellValueFactory(new PropertyValueFactory<>("jogo"));
 
-        // Popula o ComboBox de jogos
         jogoComboBox.getItems().addAll("LoL", "CS2", "Valorant", "Outro");
 
-        // Adiciona um listener para a seleção na tabela
         tabelaEquipes.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> preencherFormulario(newValue)
         );
 
-        // Carrega os dados iniciais
         carregarEquipes();
     }
 
+    /**
+     * Carrega as equipes do banco de dados e as exibe na tabela.
+     */
     private void carregarEquipes() {
         List<Equipe> equipes = equipeDAO.listarTodas();
         ObservableList<Equipe> observableEquipes = FXCollections.observableArrayList(equipes);
         tabelaEquipes.setItems(observableEquipes);
     }
 
+    /**
+     * Preenche o formulário de detalhes com as informações da equipe selecionada.
+     *
+     * @param equipe A {@link Equipe} selecionada na tabela, ou null.
+     */
     private void preencherFormulario(Equipe equipe) {
         if (equipe != null) {
             nomeField.setText(equipe.getNomeEquipe());
@@ -65,6 +77,10 @@ public class GerenciamentoEquipesController {
         }
     }
 
+    /**
+     * Manipula o clique no botão "Salvar".
+     * Cria uma nova equipe se nenhuma estiver selecionada, ou atualiza a existente.
+     */
     @FXML
     private void handleSalvarButton() {
         String nome = nomeField.getText();
@@ -73,10 +89,10 @@ public class GerenciamentoEquipesController {
 
         Equipe selecionada = tabelaEquipes.getSelectionModel().getSelectedItem();
 
-        if (selecionada == null) { // Criar nova equipe
+        if (selecionada == null) {
             Equipe novaEquipe = new Equipe(nome, jogo, descricao);
             equipeDAO.inserir(novaEquipe);
-        } else { // Atualizar equipe existente
+        } else {
             selecionada.setNomeEquipe(nome);
             selecionada.setJogo(jogo);
             selecionada.setDescricao(descricao);
@@ -87,11 +103,17 @@ public class GerenciamentoEquipesController {
         limparFormulario();
     }
 
+    /**
+     * Limpa a seleção da tabela e o formulário, preparando para uma nova inserção.
+     */
     @FXML
     private void handleNovoButton() {
         limparFormulario();
     }
     
+    /**
+     * Exclui a equipe selecionada após pedir confirmação ao usuário.
+     */
     @FXML
     private void handleExcluirButton() {
         Equipe selecionada = tabelaEquipes.getSelectionModel().getSelectedItem();
@@ -109,6 +131,9 @@ public class GerenciamentoEquipesController {
         }
     }
 
+    /**
+     * Reseta o formulário para seu estado inicial.
+     */
     private void limparFormulario() {
         tabelaEquipes.getSelectionModel().clearSelection();
         nomeField.clear();

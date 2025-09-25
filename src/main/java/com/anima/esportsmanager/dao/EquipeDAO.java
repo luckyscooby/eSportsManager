@@ -10,8 +10,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) para a entidade {@link Equipe}.
+ * Centraliza o acesso ao banco de dados para as operações de CRUD de equipes.
+ */
 public class EquipeDAO {
 
+    /**
+     * Insere uma nova equipe no banco de dados.
+     *
+     * @param equipe O objeto {@link Equipe} a ser inserido.
+     */
     public void inserir(Equipe equipe) {
         String sql = "INSERT INTO Equipes (nome_equipe, jogo, descricao) VALUES (?, ?, ?)";
         try (Connection conn = ConexaoDB.conectar();
@@ -27,6 +36,11 @@ public class EquipeDAO {
         }
     }
 
+    /**
+     * Busca e retorna uma lista de todas as equipes cadastradas.
+     *
+     * @return Uma {@link List} de objetos {@link Equipe}.
+     */
     public List<Equipe> listarTodas() {
         List<Equipe> equipes = new ArrayList<>();
         String sql = "SELECT * FROM Equipes";
@@ -49,6 +63,11 @@ public class EquipeDAO {
         return equipes;
     }
     
+    /**
+     * Atualiza os dados de uma equipe existente no banco de dados.
+     *
+     * @param equipe O objeto {@link Equipe} com os dados atualizados.
+     */
     public void atualizar(Equipe equipe) {
         String sql = "UPDATE Equipes SET nome_equipe = ?, jogo = ?, descricao = ? WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
@@ -65,6 +84,11 @@ public class EquipeDAO {
         }
     }
 
+    /**
+     * Deleta uma equipe do banco de dados com base no seu ID.
+     *
+     * @param id O ID da equipe a ser deletada.
+     */
     public void deletar(int id) {
         String sql = "DELETE FROM Equipes WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
@@ -78,6 +102,11 @@ public class EquipeDAO {
         }
     }
     
+    /**
+     * Conta o número total de equipes cadastradas.
+     *
+     * @return O número total de equipes.
+     */
     public int contarTotal() {
         String sql = "SELECT COUNT(*) FROM Equipes";
         try (Connection conn = ConexaoDB.conectar();

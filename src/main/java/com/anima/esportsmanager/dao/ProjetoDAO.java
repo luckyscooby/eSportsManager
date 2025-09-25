@@ -9,8 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Data Access Object (DAO) para a entidade {@link Projeto}.
+ * Gerencia todas as operações de banco de dados relacionadas a projetos.
+ */
 public class ProjetoDAO {
 
+    /**
+     * Insere um novo projeto no banco de dados.
+     *
+     * @param projeto O objeto {@link Projeto} a ser inserido.
+     */
     public void inserir(Projeto projeto) {
         String sql = "INSERT INTO Projetos (nome_projeto, descricao, data_inicio, data_termino_prevista, status, id_gerente) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConexaoDB.conectar();
@@ -34,6 +43,11 @@ public class ProjetoDAO {
         }
     }
 
+    /**
+     * Busca e retorna uma lista de todos os projetos, incluindo os dados de seus gerentes.
+     *
+     * @return Uma {@link List} de objetos {@link Projeto}.
+     */
     public List<Projeto> listarTodos() {
         List<Projeto> projetos = new ArrayList<>();
         String sql = "SELECT p.*, u.id as gerente_id, u.nome_completo as gerente_nome " +
@@ -68,6 +82,11 @@ public class ProjetoDAO {
         return projetos;
     }
     
+    /**
+     * Atualiza os dados de um projeto existente.
+     *
+     * @param projeto O objeto {@link Projeto} com os dados atualizados.
+     */
     public void atualizar(Projeto projeto) {
         String sql = "UPDATE Projetos SET nome_projeto = ?, descricao = ?, data_inicio = ?, data_termino_prevista = ?, status = ?, id_gerente = ? WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
@@ -87,6 +106,11 @@ public class ProjetoDAO {
         }
     }
     
+    /**
+     * Deleta um projeto do banco de dados com base no seu ID.
+     *
+     * @param id O ID do projeto a ser deletado.
+     */
     public void deletar(int id) {
         String sql = "DELETE FROM Projetos WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
@@ -98,8 +122,13 @@ public class ProjetoDAO {
         }
     }
     
+    /**
+     * Busca o projeto mais recente que está vigente na data atual.
+     * Um projeto é considerado vigente se a data atual está entre sua data de início e de término.
+     *
+     * @return Um {@link Optional} contendo o Projeto, se encontrado, ou um Optional vazio.
+     */
     public Optional<Projeto> buscarProjetoAtual() {
-        // LÓGICA ATUALIZADA: Busca projetos onde a data atual está entre o início e o fim.
         String sql = "SELECT p.*, u.id as gerente_id, u.nome_completo as gerente_nome " +
                      "FROM Projetos p LEFT JOIN Usuarios u ON p.id_gerente = u.id " +
                      "WHERE CURDATE() BETWEEN p.data_inicio AND p.data_termino_prevista " +
@@ -133,6 +162,12 @@ public class ProjetoDAO {
         return Optional.empty();
     }
     
+    /**
+     * Busca uma lista de projetos futuros, ordenados pela data de início mais próxima.
+     *
+     * @param limite O número máximo de projetos a serem retornados.
+     * @return Uma {@link List} de objetos {@link Projeto}.
+     */
     public List<Projeto> listarProximos(int limite) {
         List<Projeto> projetos = new ArrayList<>();
         String sql = "SELECT * FROM Projetos WHERE data_inicio > CURDATE() ORDER BY data_inicio ASC LIMIT ?";
@@ -155,6 +190,11 @@ public class ProjetoDAO {
         return projetos;
     }
 
+    /**
+     * Conta o número total de projetos com o status "Em Andamento".
+     *
+     * @return O número de projetos ativos.
+     */
     public int contarAtivos() {
         String sql = "SELECT COUNT(*) FROM Projetos WHERE status = 'Em Andamento'";
         try (Connection conn = ConexaoDB.conectar();

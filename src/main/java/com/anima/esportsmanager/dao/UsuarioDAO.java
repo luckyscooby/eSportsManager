@@ -11,14 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO para a entidade Usuario.
- * Contém os métodos para as operações CRUD (Create, Read, Update, Delete).
+ * Data Access Object (DAO) para a entidade {@link Usuario}.
+ * Esta classe encapsula toda a lógica de acesso ao banco de dados
+ * para as operações de CRUD (Create, Read, Update, Delete) de usuários.
  */
 public class UsuarioDAO {
 
     /**
      * Insere um novo usuário no banco de dados.
-     * @param usuario O objeto Usuario a ser inserido.
+     *
+     * @param usuario O objeto {@link Usuario} a ser persistido.
      */
     public void inserir(Usuario usuario) {
         String sql = "INSERT INTO Usuarios (nome_completo, cpf, email, cargo, login, senha) VALUES (?, ?, ?, ?, ?, ?)";
@@ -33,15 +35,15 @@ public class UsuarioDAO {
             pstmt.setString(6, usuario.getSenha());
 
             pstmt.executeUpdate();
-            System.out.println("Usuário " + usuario.getNomeCompleto() + " inserido com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao inserir usuário: " + e.getMessage());
         }
     }
 
     /**
-     * Retorna uma lista com todos os usuários cadastrados no banco de dados.
-     * @return Uma lista de objetos Usuario.
+     * Busca e retorna uma lista de todos os usuários cadastrados no banco de dados.
+     *
+     * @return Uma {@link List} de objetos {@link Usuario}.
      */
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
@@ -59,7 +61,6 @@ public class UsuarioDAO {
                 usuario.setEmail(rs.getString("email"));
                 usuario.setCargo(rs.getString("cargo"));
                 usuario.setLogin(rs.getString("login"));
-                
                 usuarios.add(usuario);
             }
         } catch (SQLException e) {
@@ -70,13 +71,15 @@ public class UsuarioDAO {
 
     /**
      * Atualiza os dados de um usuário existente no banco de dados.
-     * @param usuario O objeto Usuario com os dados atualizados.
+     * A senha não é atualizada neste método.
+     *
+     * @param usuario O objeto {@link Usuario} com os dados atualizados.
      */
     public void atualizar(Usuario usuario) {
         String sql = "UPDATE Usuarios SET nome_completo = ?, cpf = ?, email = ?, cargo = ?, login = ? WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setString(1, usuario.getNomeCompleto());
             pstmt.setString(2, usuario.getCpf());
             pstmt.setString(3, usuario.getEmail());
@@ -85,29 +88,33 @@ public class UsuarioDAO {
             pstmt.setInt(6, usuario.getId());
 
             pstmt.executeUpdate();
-            System.out.println("Usuário " + usuario.getNomeCompleto() + " atualizado com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar usuário: " + e.getMessage());
         }
     }
 
     /**
-     * Deleta um usuário do banco de dados com base no ID.
+     * Deleta um usuário do banco de dados com base no seu ID.
+     *
      * @param id O ID do usuário a ser deletado.
      */
     public void deletar(int id) {
         String sql = "DELETE FROM Usuarios WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-            System.out.println("Usuário deletado com sucesso!");
         } catch (SQLException e) {
             System.err.println("Erro ao deletar usuário: " + e.getMessage());
         }
     }
-    
+
+    /**
+     * Conta o número total de usuários cadastrados no banco de dados.
+     *
+     * @return O número total de usuários.
+     */
     public int contarTotal() {
         String sql = "SELECT COUNT(*) FROM Usuarios";
         try (Connection conn = ConexaoDB.conectar();

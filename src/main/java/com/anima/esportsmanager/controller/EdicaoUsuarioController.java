@@ -8,6 +8,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+/**
+ * Controller para a tela de Edição de Usuário.
+ * Responsável por preencher o formulário com dados existentes,
+ * coletar as alterações e enviá-las para o DAO para atualização.
+ */
 public class EdicaoUsuarioController {
 
     @FXML private TextField nomeCompletoField;
@@ -18,19 +23,26 @@ public class EdicaoUsuarioController {
     @FXML private Button salvarButton;
 
     private Usuario usuario;
-    private UsuarioDAO usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
 
+    /**
+     * Construtor. Inicializa o DAO.
+     */
     public EdicaoUsuarioController() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    /**
+     * Método de inicialização. Popula o ComboBox de cargos.
+     */
     @FXML
     public void initialize() {
         cargoComboBox.getItems().addAll("Administrador", "Técnico", "Jogador");
     }
 
     /**
-     * Recebe o objeto Usuário da tela de listagem e preenche os campos.
+     * Recebe o objeto {@link Usuario} da tela de listagem e preenche os campos do formulário.
+     *
      * @param usuario O usuário a ser editado.
      */
     public void initData(Usuario usuario) {
@@ -42,19 +54,26 @@ public class EdicaoUsuarioController {
         cargoComboBox.setValue(usuario.getCargo());
     }
 
+    /**
+     * Manipula o evento de clique no botão "Salvar Alterações".
+     * Atualiza o objeto de usuário com os novos dados e o persiste no banco.
+     */
     @FXML
     private void handleSalvarButtonAction() {
-        // Atualiza o objeto usuario com os novos dados dos campos
         usuario.setNomeCompleto(nomeCompletoField.getText());
         usuario.setCpf(cpfField.getText());
         usuario.setEmail(emailField.getText());
         usuario.setLogin(loginField.getText());
         usuario.setCargo(cargoComboBox.getValue());
 
-        // Chama o DAO para persistir as alterações
         usuarioDAO.atualizar(usuario);
-
-        // Fecha a janela de edição
+        fecharJanela();
+    }
+    
+    /**
+     * Fecha a janela de edição.
+     */
+    private void fecharJanela() {
         Stage stage = (Stage) salvarButton.getScene().getWindow();
         stage.close();
     }

@@ -17,13 +17,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Controller para a tela de Gerenciamento de Projetos.
+ * Permite listar, criar, editar e excluir projetos.
+ */
 public class GerenciamentoProjetosController {
 
     @FXML private TableView<Projeto> tabelaProjetos;
     @FXML private TableColumn<Projeto, Integer> colunaId;
     @FXML private TableColumn<Projeto, String> colunaNome;
-    @FXML private TableColumn<Projeto, LocalDate> colunaDataInicio; // COLUNA ADICIONADA
-    @FXML private TableColumn<Projeto, LocalDate> colunaDataTermino; // COLUNA ADICIONADA
+    @FXML private TableColumn<Projeto, LocalDate> colunaDataInicio;
+    @FXML private TableColumn<Projeto, LocalDate> colunaDataTermino;
     @FXML private TableColumn<Projeto, String> colunaStatus;
     @FXML private TableColumn<Projeto, String> colunaGerente;
 
@@ -34,26 +38,39 @@ public class GerenciamentoProjetosController {
     @FXML private ComboBox<Usuario> gerenteComboBox;
     @FXML private TextArea descricaoArea;
 
-    private ProjetoDAO projetoDAO;
-    private UsuarioDAO usuarioDAO;
+    private final ProjetoDAO projetoDAO;
+    private final UsuarioDAO usuarioDAO;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Construtor. Inicializa os DAOs.
+     */
     public GerenciamentoProjetosController() {
         this.projetoDAO = new ProjetoDAO();
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    /**
+     * Método de inicialização. Configura todos os componentes da tela.
+     */
     @FXML
     public void initialize() {
+        configurarTabela();
+        configurarFormulario();
+        carregarProjetos();
+    }
+    
+    /**
+     * Configura as colunas da tabela, incluindo formatação customizada para datas e objetos.
+     */
+    private void configurarTabela() {
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("nomeProjeto"));
         colunaStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         
-        // Configura as novas colunas de data
         colunaDataInicio.setCellValueFactory(new PropertyValueFactory<>("dataInicio"));
         colunaDataTermino.setCellValueFactory(new PropertyValueFactory<>("dataTerminoPrevista"));
         
-        // Formata a exibição das datas nas colunas
         formatarColunaData(colunaDataInicio);
         formatarColunaData(colunaDataTermino);
 
@@ -61,36 +78,30 @@ public class GerenciamentoProjetosController {
             Usuario gerente = cellData.getValue().getGerente();
             return new SimpleStringProperty(gerente != null ? gerente.getNomeCompleto() : "N/D");
         });
+    }
 
+    /**
+     * Configura os componentes do formulário, como ComboBoxes e o listener de seleção da tabela.
+     */
+    private void configurarFormulario() {
         statusComboBox.getItems().addAll("Planejado", "Em Andamento", "Concluído", "Cancelado");
         carregarGerentes();
 
         tabelaProjetos.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldV, newV) -> preencherFormulario(newV)
         );
-
-        carregarProjetos();
     }
     
-    // Método auxiliar para formatar colunas de data
-    private void formatarColunaData(TableColumn<Projeto, LocalDate> coluna) {
-        coluna.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                } else {
-                    setText(formatter.format(item));
-                }
-            }
-        });
-    }
-
+    /**
+     * Carrega os projetos do banco e atualiza a tabela.
+     */
     private void carregarProjetos() {
         tabelaProjetos.setItems(FXCollections.observableArrayList(projetoDAO.listarTodos()));
     }
     
+    /**
+     * Carrega os usuários que podem ser gerentes (Técnicos e Administradores) e os popula no ComboBox.
+     */
     private void carregarGerentes() {
         List<Usuario> possiveisGerentes = usuarioDAO.listarTodos().stream()
                 .filter(u -> u.getCargo().equals("Técnico") || u.getCargo().equals("Administrador"))
@@ -109,6 +120,11 @@ public class GerenciamentoProjetosController {
         });
     }
 
+    /**
+     * Preenche o formulário com os dados do projeto selecionado.
+     *
+     * @param projeto O {@link Projeto} selecionado, ou null.
+     */
     private void preencherFormulario(Projeto projeto) {
         if (projeto != null) {
             nomeField.setText(projeto.getNomeProjeto());
@@ -122,6 +138,9 @@ public class GerenciamentoProjetosController {
         }
     }
 
+    /**
+     * Manipula o clique no botão "Salvar", criando ou atualizando um projeto.
+     */
     @FXML
     private void handleSalvarButton() {
         Projeto selecionado = tabelaProjetos.getSelectionModel().getSelectedItem();
@@ -149,11 +168,17 @@ public class GerenciamentoProjetosController {
         limparFormulario();
     }
 
+    /**
+     * Limpa a seleção e o formulário.
+     */
     @FXML
     private void handleNovoButton() {
         limparFormulario();
     }
 
+    /**
+     * Exclui o projeto selecionado após confirmação.
+     */
     @FXML
     private void handleExcluirButton() {
         Projeto selecionado = tabelaProjetos.getSelectionModel().getSelectedItem();
@@ -171,6 +196,9 @@ public class GerenciamentoProjetosController {
         }
     }
     
+    /**
+     * Reseta o formulário para seu estado inicial.
+     */
     private void limparFormulario() {
         tabelaProjetos.getSelectionModel().clearSelection();
         nomeField.clear();
@@ -179,5 +207,24 @@ public class GerenciamentoProjetosController {
         dataFimPicker.setValue(null);
         statusComboBox.setValue(null);
         gerenteComboBox.setValue(null);
+    }
+    
+    /**
+     * Método utilitário para formatar a exibição de datas em uma coluna da tabela.
+     *
+     * @param coluna A {@link TableColumn} a ser formatada.
+     */
+    private void formatarColunaData(TableColumn<Projeto, LocalDate> coluna) {
+        coluna.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(formatter.format(item));
+                }
+            }
+        });
     }
 }

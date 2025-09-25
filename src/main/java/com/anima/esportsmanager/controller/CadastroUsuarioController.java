@@ -3,14 +3,20 @@ package com.anima.esportsmanager.controller;
 import com.anima.esportsmanager.dao.UsuarioDAO;
 import com.anima.esportsmanager.model.Usuario;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
+/**
+ * Controller para a tela de Cadastro de Usuário.
+ * Responsável por coletar os dados do formulário, validar e
+ * enviar para o DAO para inserção no banco de dados.
+ */
 public class CadastroUsuarioController {
 
-    // Injeção dos componentes da interface gráfica (definidos no FXML com fx:id)
     @FXML private TextField nomeCompletoField;
     @FXML private TextField cpfField;
     @FXML private TextField emailField;
@@ -18,29 +24,31 @@ public class CadastroUsuarioController {
     @FXML private PasswordField senhaField;
     @FXML private ComboBox<String> cargoComboBox;
     @FXML private Label statusLabel;
+    @FXML private Button salvarButton;
 
-    private UsuarioDAO usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
 
+    /**
+     * Construtor. Inicializa o DAO.
+     */
     public CadastroUsuarioController() {
         this.usuarioDAO = new UsuarioDAO();
     }
     
     /**
-     * Método executado automaticamente quando o FXML é carregado.
-     * Usamos para inicializar componentes.
+     * Método de inicialização. Popula o ComboBox de cargos.
      */
     @FXML
     public void initialize() {
-        // Popula o ComboBox com as opções de cargo
         cargoComboBox.getItems().addAll("Administrador", "Técnico", "Jogador");
     }
 
     /**
-     * Método chamado quando o botão "Salvar" é clicado (definido no onAction do FXML).
+     * Manipula o evento de clique no botão "Salvar".
+     * Coleta, valida e persiste os dados do novo usuário.
      */
     @FXML
     private void handleSalvarButtonAction() {
-        // 1. Coletar os dados da interface
         String nome = nomeCompletoField.getText();
         String cpf = cpfField.getText();
         String email = emailField.getText();
@@ -48,37 +56,53 @@ public class CadastroUsuarioController {
         String senha = senhaField.getText();
         String cargo = cargoComboBox.getValue();
 
-        // 2. Validação simples (verificar se campos essenciais não estão vazios)
-        if (nome.isEmpty() || login.isEmpty() || senha.isEmpty() || cargo == null) {
-            statusLabel.setText("Erro: Preencha todos os campos obrigatórios!");
-            statusLabel.setStyle("-fx-text-fill: red;");
+        if (!validarCampos(nome, login, senha, cargo)) {
             return;
         }
 
-        // 3. Criar o objeto Model
         Usuario novoUsuario = new Usuario(nome, cpf, email, cargo, login, senha);
 
-        // 4. Chamar o DAO para persistir o objeto
         try {
             usuarioDAO.inserir(novoUsuario);
-            statusLabel.setText("Usuário cadastrado com sucesso!");
-            statusLabel.setStyle("-fx-text-fill: green;");
-            limparCampos();
+            fecharJanela();
         } catch (Exception e) {
-            statusLabel.setText("Erro ao cadastrar usuário: " + e.getMessage());
-            statusLabel.setStyle("-fx-text-fill: red;");
+            setStatusLabel("Erro ao cadastrar: " + e.getMessage(), true);
         }
+    }
+    
+    /**
+     * Valida se os campos obrigatórios do formulário foram preenchidos.
+     *
+     * @param nome O nome do usuário.
+     * @param login O login do usuário.
+     * @param senha A senha do usuário.
+     * @param cargo O cargo do usuário.
+     * @return {@code true} se os campos forem válidos, {@code false} caso contrário.
+     */
+    private boolean validarCampos(String nome, String login, String senha, String cargo) {
+        if (nome.isBlank() || login.isBlank() || senha.isBlank() || cargo == null) {
+            setStatusLabel("Erro: Preencha todos os campos obrigatórios!", true);
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Atualiza a label de status com uma mensagem para o usuário.
+     *
+     * @param mensagem A mensagem a ser exibida.
+     * @param isError  Define se a mensagem é de erro (vermelha) ou sucesso (verde).
+     */
+    private void setStatusLabel(String mensagem, boolean isError) {
+        statusLabel.setText(mensagem);
+        statusLabel.setStyle(isError ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
     }
 
     /**
-     * Limpa os campos do formulário após uma inserção bem-sucedida.
+     * Fecha a janela de cadastro.
      */
-    private void limparCampos() {
-        nomeCompletoField.clear();
-        cpfField.clear();
-        emailField.clear();
-        loginField.clear();
-        senhaField.clear();
-        cargoComboBox.getSelectionModel().clearSelection();
+    private void fecharJanela() {
+        Stage stage = (Stage) salvarButton.getScene().getWindow();
+        stage.close();
     }
 }

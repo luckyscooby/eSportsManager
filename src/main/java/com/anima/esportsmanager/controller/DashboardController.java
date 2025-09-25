@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+/**
+ * Controller para a tela principal (Dashboard).
+ * Responsável por exibir estatísticas e navegar para outros módulos.
+ */
 public class DashboardController {
 
     @FXML private Label statsUsuariosLabel;
@@ -31,17 +35,24 @@ public class DashboardController {
     @FXML private Label projetoAtualInicioLabel;
     @FXML private Label projetoAtualDataLabel;
 
-    private UsuarioDAO usuarioDAO;
-    private EquipeDAO equipeDAO;
-    private ProjetoDAO projetoDAO;
+    private final UsuarioDAO usuarioDAO;
+    private final EquipeDAO equipeDAO;
+    private final ProjetoDAO projetoDAO;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Construtor. Inicializa as instâncias dos DAOs.
+     */
     public DashboardController() {
         this.usuarioDAO = new UsuarioDAO();
         this.equipeDAO = new EquipeDAO();
         this.projetoDAO = new ProjetoDAO();
     }
 
+    /**
+     * Método de inicialização, chamado automaticamente após o FXML ser carregado.
+     * Popula todos os componentes visuais do dashboard.
+     */
     @FXML
     public void initialize() {
         carregarEstatisticas();
@@ -49,12 +60,19 @@ public class DashboardController {
         carregarProximosProjetos();
     }
 
+    /**
+     * Busca os dados agregados (contagens) nos DAOs e atualiza as labels de estatísticas.
+     */
     private void carregarEstatisticas() {
         statsUsuariosLabel.setText(String.valueOf(usuarioDAO.contarTotal()));
         statsEquipesLabel.setText(String.valueOf(equipeDAO.contarTotal()));
         statsProjetosLabel.setText(String.valueOf(projetoDAO.contarAtivos()));
     }
 
+    /**
+     * Busca o projeto vigente no banco de dados e exibe suas informações.
+     * Se nenhum projeto estiver vigente, exibe uma mensagem informativa.
+     */
     private void carregarProjetoAtual() {
         Optional<Projeto> projetoAtualOpt = projetoDAO.buscarProjetoAtual();
         
@@ -63,19 +81,19 @@ public class DashboardController {
             projetoAtualNomeLabel.setText(projetoAtual.getNomeProjeto());
             projetoAtualInicioLabel.setText("Início em: " + projetoAtual.getDataInicio().format(formatter));
             projetoAtualDataLabel.setText("Término previsto para: " + projetoAtual.getDataTerminoPrevista().format(formatter));
-            
-            projetoAtualBox.setVisible(true);
-            projetoAtualBox.setManaged(true);
         } else {
             projetoAtualNomeLabel.setText("Nenhum projeto em vigência no momento.");
             projetoAtualInicioLabel.setText("");
             projetoAtualDataLabel.setText("");
-            
-            projetoAtualBox.setVisible(true);
-            projetoAtualBox.setManaged(true);
         }
+        projetoAtualBox.setVisible(true);
+        projetoAtualBox.setManaged(true);
     }
 
+    /**
+     * Busca os próximos projetos futuros e os exibe na ListView.
+     * Formata cada célula para mostrar o nome e a data de início do projeto.
+     */
     private void carregarProximosProjetos() {
         projetosListView.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -91,24 +109,37 @@ public class DashboardController {
         projetosListView.setItems(FXCollections.observableArrayList(projetoDAO.listarProximos(5)));
     }
 
+    /**
+     * Abre a janela de gerenciamento de usuários.
+     */
     @FXML
     private void abrirGerenciamentoUsuarios() {
-        // CAMINHO ATUALIZADO
         abrirJanela("/view/GerenciamentoUsuariosView.fxml", "Gerenciamento de Usuários", true);
     }
 
+    /**
+     * Abre a janela de gerenciamento de equipes.
+     */
     @FXML
     private void abrirGerenciamentoEquipes() {
-        // CAMINHO ATUALIZADO
         abrirJanela("/view/GerenciamentoEquipesView.fxml", "Gerenciamento de Equipes", true);
     }
 
+    /**
+     * Abre a janela de gerenciamento de projetos.
+     */
     @FXML
     private void abrirGerenciamentoProjetos() {
-        // CAMINHO ATUALIZADO
         abrirJanela("/view/GerenciamentoProjetosView.fxml", "Gerenciamento de Projetos", true);
     }
 
+    /**
+     * Método utilitário para abrir uma nova janela FXML de forma modal.
+     *
+     * @param caminhoFxml      O caminho para o arquivo FXML a ser carregado.
+     * @param titulo           O título da nova janela.
+     * @param redimensionavel  Define se a janela pode ser redimensionada.
+     */
     private void abrirJanela(String caminhoFxml, String titulo, boolean redimensionavel) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(ESportsManager.class.getResource(caminhoFxml));
