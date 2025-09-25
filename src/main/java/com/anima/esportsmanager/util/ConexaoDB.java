@@ -19,7 +19,7 @@ public class ConexaoDB {
     private static final String USER = "root";
 
     /** Senha do banco de dados. ALTERE ESTE VALOR para a sua senha local. */
-    private static final String PASSWORD = "sua_senha_aqui";
+    private static final String PASSWORD = "";
 
     /** Instância única da conexão (Padrão Singleton). */
     private static Connection conexao = null;
