@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.anima.esportsmanager"},{"l":"com.anima.esportsmanager.controller"},{"l":"com.anima.esportsmanager.dao"},{"l":"com.anima.esportsmanager.model"},{"l":"com.anima.esportsmanager.util"}];updateSearchResults();
