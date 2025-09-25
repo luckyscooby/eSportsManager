@@ -18,8 +18,8 @@
   <a href="#-sobre-o-projeto">Sobre</a> •
   <a href="#-funcionalidades">Funcionalidades</a> •
   <a href="#-instalação-rápida">Instalação</a> •
-  <a href="#%EF%B8%8F-desenvolvimento">Desenvolvimento</a> •
-  <a href="https://luckyscooby.github.io/eSportsManager/" target="_blank">Documentação Técnica (javadoc)</a> •
+  <a href="#%EF%B8%8F-desenvolvimento"><strong>Desenvolvimento</strong></a> •
+  <a href="https://luckyscooby.github.io/eSportsManager/" target="_blank"><strong>Documentação Técnica (javadoc)</strong></a> •
   <a href="#-contribuição">Contribuição</a> •
   <a href="#-licença">Licença</a>
 </p>
@@ -46,6 +46,18 @@ eSports Manager
 ├── Database (MariaDB)
 └── Build Tool (Maven)
 ```
+
+---
+
+## 🎥 Apresentação em Vídeo
+
+Assista a uma demonstração completa das funcionalidades e da interface do eSports Manager.
+
+<div align="center">
+  <a href="https://youtu.be/fx8XqV2QsL8" target="_blank">
+    <img src="https://img.youtube.com/vi/fx8XqV2QsL8/0.jpg" alt="Vídeo de Apresentação do eSports Manager" width="600">
+  </a>
+</div>
 
 ---
 
